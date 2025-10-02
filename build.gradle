@@ -1,0 +1,60 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'pencil_utensil'
+version = '0.0.1'
+description = 'Organization microservice for Organizator project'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation('org.springframework.boot:spring-boot-starter-data-jpa') {
+		exclude group: 'org.hibernate', module: 'hibernate-core'
+	}
+	implementation 'org.eclipse.persistence:eclipselink:4.0.7'
+	implementation 'org.postgresql:postgresql:42.7.7'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+bootRun {
+	standardInput = System.in
+	classpath = sourceSets.main.runtimeClasspath
+	jvmArgs = [
+		"-XX:+AllowEnhancedClassRedefinition",
+		"-XX:HotswapAgent=fatjar",
+		"--add-opens=java.base/java.net=ALL-UNNAMED"
+	]
+}
+
+tasks.register("debugRun", BootRun) {
+	group = "application"
+	description = "Hotswap shenanigans"
+	mainClass.set(bootRun.mainClass)
+	classpath = bootRun.classpath
+	jvmArgs = bootRun.jvmArgs + [
+		"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+		"-Dspring.profiles.active=dev"
+	]
+}
