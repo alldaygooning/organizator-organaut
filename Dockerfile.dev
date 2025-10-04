@@ -1,0 +1,17 @@
+# https://github.com/alldaygooning/hotswapagent-runtime-docker
+# https://hub.docker.com/repository/docker/debi1/hotswapagent-runtime
+FROM hotswapagent-runtime:latest
+
+WORKDIR /organaut
+
+COPY gradlew gradlew
+COPY gradle/ gradle/
+COPY build.gradle settings.gradle gradle.properties ./
+
+RUN chmod +x gradlew
+# Resolve all dependencies (cached layer)
+RUN gradle --no-daemon dependencies
+
+# Port 8080 for Application itself
+# Port 5005 for Java Debug Wire Protocol (JDWP)
+EXPOSE 8080 5005
