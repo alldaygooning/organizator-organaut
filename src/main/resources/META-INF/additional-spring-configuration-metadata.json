@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "lobby_boy.api.key",
+    "type": "java.lang.String",
+    "description": "API key to access LobbyBoy as a microservice."
+  },
+  {
+    "name": "lobby_boy.url",
+    "type": "java.lang.String",
+    "description": "URL where LobbyBoy microservice resides in docker network."
+  }
+]}
