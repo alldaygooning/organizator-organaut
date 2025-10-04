@@ -28,7 +28,7 @@ public class CoordinatesController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(coordinatesService.create(req.x, req.y));
 	}
 
-	class CreateRequest {
+	static class CreateRequest {
 		@NotNull(message = "coordinates.x.notnull")
 		@Max(value = Coordinates.X_MAX, message = "coordinates.x.size")
 		public Integer x;

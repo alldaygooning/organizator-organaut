@@ -27,7 +27,7 @@ public class AddressController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(addressService.create(req.street, req.zip));
 	}
 	
-	class CreateRequest{
+	static class CreateRequest {
 		@NotNull(message = "address.street.notnull")
 		public String street;
 		@NotNull(message = "address.zip.notnull")
