@@ -1,6 +1,7 @@
 package pencil_utensil.organaut.organization.coordinates;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,11 @@ public class CoordinatesService {
 
 	@Transactional
 	public Coordinates create(int x, int y) {
+		Optional<Coordinates> opt = coordinatesRepository.findByXAndY(x, y);
+		if (opt.isPresent()) {
+			return opt.get();
+		}
+
 		Coordinates coordinates = coordinatesRepository.save(new Coordinates(x, y));
 		sseService.broadcastEvent(BroadcastEvent.COORDINATES_CREATED, coordinates);
 		return coordinates;

@@ -29,7 +29,8 @@ public class SecurityConfig {
 		return commonConfig(http)
 				.securityMatcher(
 						RegexRequestMatcher
-								.regexMatcher("^/api/organizations(/[1-9]\\d*|/addresses|/coordinates|/sse)?$"))
+								.regexMatcher(
+										"^/api/organizations(/[1-9]\\d*|/addresses|/coordinates|/sse|/total-rating|/top-turnover|/employee-count)?$"))
 				.authorizeHttpRequests(authorize -> authorize
 						.anyRequest().permitAll())
 				.build();
