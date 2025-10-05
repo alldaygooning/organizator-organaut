@@ -5,13 +5,19 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pencil_utensil.organaut.network.sse.BroadcastEvent;
+import pencil_utensil.organaut.network.sse.SseService;
+
 @Service
 public class AddressService {
 
+	private final SseService sseService;
+
 	private final AddressRepository addressRepository;
 
-	AddressService(AddressRepository addressRepository) {
+	AddressService(AddressRepository addressRepository, SseService sseService) {
 		this.addressRepository = addressRepository;
+		this.sseService = sseService;
 	}
 
 	@Transactional(readOnly = true)
@@ -24,7 +30,8 @@ public class AddressService {
 
 	@Transactional
 	public Address create(String street, String zip) {
-		Address address = new Address(street, zip);
-		return addressRepository.save(address);
+		Address address = addressRepository.save(new Address(street, zip));
+		sseService.broadcastEvent(BroadcastEvent.ADDRESS_CREATED, address);
+		return address;
 	}
 }

@@ -106,6 +106,7 @@ public class OrganizationService {
 		if (postalAddress != null) {
 			organization.setPostalAddress(postalAddress);
 		}
+		sseService.broadcastEvent(BroadcastEvent.ORGANIZATION_UPDATED, getDto(organization));
 		return organization;
 	}
 
