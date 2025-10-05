@@ -27,7 +27,8 @@ public class SecurityConfig {
 	@Order(1)
 	SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
 		return commonConfig(http)
-				.securityMatcher(RegexRequestMatcher.regexMatcher("^/api/organizations(/[1-9]\\d*)?$"))
+				.securityMatcher(
+						RegexRequestMatcher.regexMatcher("^/api/organizations(/[1-9]\\d*|/addresses|/coordinates)?$"))
 				.authorizeHttpRequests(authorize -> authorize
 						.anyRequest().permitAll())
 				.build();

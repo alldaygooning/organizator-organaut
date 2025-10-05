@@ -1,7 +1,10 @@
 package pencil_utensil.organaut.network.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,9 @@ public class CoordinatesController {
 	CoordinatesController(CoordinatesService coordinatesService) {
 		this.coordinatesService = coordinatesService;
 	}
+
+	@GetMapping
+	public ResponseEntity<List<Coordinates>> getAll() { return ResponseEntity.ok(coordinatesService.getAll()); }
 
 	@PostMapping("/create")
 	public ResponseEntity<Coordinates> create(@Valid @RequestBody CreateRequest req) {
