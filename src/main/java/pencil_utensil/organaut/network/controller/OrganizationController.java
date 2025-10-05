@@ -36,6 +36,7 @@ import pencil_utensil.organaut.organization.address.Address;
 import pencil_utensil.organaut.organization.address.AddressService;
 import pencil_utensil.organaut.organization.coordinates.Coordinates;
 import pencil_utensil.organaut.organization.coordinates.CoordinatesService;
+import pencil_utensil.organaut.organization.repository.OrganizationRepository.AddressCountProjection;
 
 @RestController
 @RequestMapping("/api/organizations")
@@ -81,6 +82,8 @@ public class OrganizationController {
 		public Organization organization;
 		public Integer ownerId;
 	}
+
+
 
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
@@ -224,4 +227,30 @@ public class OrganizationController {
 
 	static record UserCredentials(Integer id, String name) {
 	};
+
+	// FUNNIES FUNNIES FUNNIES...
+
+	@DeleteMapping("/delete/type")
+	public ResponseEntity<List<Long>> deleteByType(@RequestBody OrganizationType type) {
+		UserCredentials user = getUserCredentials();
+		return ResponseEntity.ok(organizationService.deleteByType(user.id, type));
+	}
+
+	@GetMapping("/total-rating")
+	public ResponseEntity<Long> getTotalRating() { return ResponseEntity.ok(organizationService.getTotalRating()); }
+
+	@GetMapping("/top-turnover")
+	public ResponseEntity<List<Organization>> getTopByTurnover() {
+		return ResponseEntity.ok(organizationService.getTopByTurnover());
+	}
+
+	@GetMapping("/employee-count")
+	public ResponseEntity<Double> getAverageEmployeeCount() {
+		return ResponseEntity.ok(organizationService.getAverageEmployeeCount());
+	}
+
+	@GetMapping("/group-by-address")
+	public ResponseEntity<List<AddressCountProjection>> groupByAddress() {
+		return ResponseEntity.ok(organizationService.grouptByAddress());
+	}
 }

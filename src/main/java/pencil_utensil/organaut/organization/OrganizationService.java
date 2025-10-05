@@ -2,6 +2,7 @@ package pencil_utensil.organaut.organization;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import pencil_utensil.organaut.network.sse.SseService;
 import pencil_utensil.organaut.organization.address.Address;
 import pencil_utensil.organaut.organization.coordinates.Coordinates;
 import pencil_utensil.organaut.organization.repository.OrganizationRepository;
+import pencil_utensil.organaut.organization.repository.OrganizationRepository.AddressCountProjection;
 import pencil_utensil.organaut.organization.repository.UserOrganization;
 import pencil_utensil.organaut.organization.repository.UserOrganizationId;
 import pencil_utensil.organaut.organization.repository.UserOrganizationRepository;
@@ -152,5 +154,32 @@ public class OrganizationService {
 	@Transactional(readOnly = true)
 	public Integer findOwnerId(Long organizationId) {
 		return userOrganizationRepository.findOwnerId(organizationId);
+	}
+
+	@Transactional
+	public List<Long> deleteByType(Integer userId, OrganizationType type) {
+		List<Long> deleted = organizationRepository.deleteByType(userId, type.name());
+		sseService.broadcastEvent(BroadcastEvent.ORGANIZATIONS_DELETED, deleted);
+		return deleted;
+	}
+
+	@Transactional(readOnly = true)
+	public Long getTotalRating() { return organizationRepository.getTotalRating(); }
+
+	@Transactional(readOnly = true)
+	public List<Organization> getTopByTurnover() {
+		return organizationRepository.getTopOrganizationIdsByTurnover().stream()
+				.map(id -> {
+					return get(id);
+				})
+				.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public Double getAverageEmployeeCount() { return organizationRepository.getAverageEmployeeCount(); }
+
+	@Transactional(readOnly = true)
+	public List<AddressCountProjection> grouptByAddress() {
+		return organizationRepository.groupByAddress();
 	}
 }
