@@ -125,7 +125,7 @@ public class OrganizationService {
 		UserOrganization uo = new UserOrganization(ownershipId);
 		userOrganizationRepository.save(uo);
 
-		sseService.broadcastEvent(BroadcastEvent.ORGANIZATION_CREATED, saved);
+		sseService.broadcastEvent(BroadcastEvent.ORGANIZATION_CREATED, getDto(saved));
 		return saved;
 	}
 
@@ -138,6 +138,7 @@ public class OrganizationService {
 			throw new OwnershipException();
 		}
 		organizationRepository.deleteById(organizationId);
+		sseService.broadcastEvent(BroadcastEvent.ORGANIZATION_DELETED, organizationId);
 	}
 
 	@Transactional(readOnly = true)
