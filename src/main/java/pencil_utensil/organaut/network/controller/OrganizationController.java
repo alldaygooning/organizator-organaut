@@ -103,7 +103,7 @@ public class OrganizationController {
 	@PatchMapping("/update/{id}")
 	public ResponseEntity<Organization> update(@PathVariable Long id, @Valid @RequestBody UpdateRequest req) {
 		UserCredentials user = getUserCredentials();
-		Organization old;
+		String old;
 		Organization current;
 
 		Coordinates coordinates = null;
@@ -120,7 +120,7 @@ public class OrganizationController {
 		}
 
 		try {
-			old = organizationService.get(id);
+			old = organizationService.get(id).toString();
 			current =
 					organizationService.update(user.id, id, req.name, coordinates, address, req.annualTurnover,
 							req.employeesCount, req.rating, req.fullName, req.type, postalAddress);
@@ -130,7 +130,7 @@ public class OrganizationController {
 			return ResponseEntity.badRequest().build();
 		}
 
-		LOGGER.info("{} updated \n{} ->\n{}", user.name, old.toString(), current.toString());
+		LOGGER.info("{} updated \n{} ->\n{}", user.name, old, current.toString());
 		return ResponseEntity.ok(current);
 	}
 
