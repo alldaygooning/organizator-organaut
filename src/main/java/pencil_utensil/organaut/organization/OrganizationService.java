@@ -11,6 +11,8 @@ import pencil_utensil.organaut.exception.OwnershipException;
 import pencil_utensil.organaut.organization.address.Address;
 import pencil_utensil.organaut.organization.coordinates.Coordinates;
 import pencil_utensil.organaut.organization.repository.OrganizationRepository;
+import pencil_utensil.organaut.organization.repository.UserOrganization;
+import pencil_utensil.organaut.organization.repository.UserOrganizationId;
 import pencil_utensil.organaut.organization.repository.UserOrganizationRepository;
 
 @Service
@@ -101,11 +103,16 @@ public class OrganizationService {
 	}
 
 	@Transactional
-	public Organization create(String name, Coordinates coordinates, Address address, Integer annualTurnover,
+	public Organization create(Integer userId, String name, Coordinates coordinates, Address address,
+			Integer annualTurnover,
 			Integer employeesCount, int rating, String fullName, OrganizationType type, Address postalAddress) {
 		Organization organization = new Organization(name, coordinates, address, annualTurnover, employeesCount, rating,
 				fullName, type, postalAddress);
-		return organizationRepository.save(organization);
+		Organization saved = organizationRepository.save(organization);
+		UserOrganizationId ownershipId = new UserOrganizationId(userId, saved.getId());
+		UserOrganization uo = new UserOrganization(ownershipId);
+		userOrganizationRepository.save(uo);
+		return saved;
 	}
 
 	@Transactional
@@ -124,5 +131,10 @@ public class OrganizationService {
 		return userOrganizationRepository.existsById_UserIdAndId_OrganizationId(
 				Objects.requireNonNull(userId, "User ID should not be null"),
 				Objects.requireNonNull(organizationId, "Organization ID should not be null"));
+	}
+
+	@Transactional(readOnly = true)
+	public Integer findOwnerId(Long organizationId) {
+		return userOrganizationRepository.findOwnerId(organizationId);
 	}
 }
