@@ -1,5 +1,7 @@
 package pencil_utensil.organaut.organization.coordinates;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,9 @@ public class CoordinatesService {
 	CoordinatesService(CoordinatesRepository coordinatesRepository) {
 		this.coordinatesRepository = coordinatesRepository;
 	}
+
+	@Transactional(readOnly = true)
+	public List<Coordinates> getAll() { return coordinatesRepository.findAll(); }
 
 	@Transactional(readOnly = true)
 	public Coordinates get(int id) {

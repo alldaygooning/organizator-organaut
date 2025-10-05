@@ -1,5 +1,7 @@
 package pencil_utensil.organaut.organization.address;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,9 @@ public class AddressService {
 	AddressService(AddressRepository addressRepository) {
 		this.addressRepository = addressRepository;
 	}
+
+	@Transactional(readOnly = true)
+	public List<Address> getAll() { return addressRepository.findAll(); }
 
 	@Transactional(readOnly = true)
 	public Address get(int id) {
