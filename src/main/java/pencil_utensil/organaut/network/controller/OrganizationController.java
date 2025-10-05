@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -26,6 +28,7 @@ import jakarta.validation.constraints.Size;
 import pencil_utensil.organaut.exception.OrganizationNotFoundException;
 import pencil_utensil.organaut.exception.OwnershipException;
 import pencil_utensil.organaut.network.security.filter.JwtFilter;
+import pencil_utensil.organaut.network.sse.SseService;
 import pencil_utensil.organaut.organization.Organization;
 import pencil_utensil.organaut.organization.OrganizationService;
 import pencil_utensil.organaut.organization.OrganizationType;
@@ -38,6 +41,8 @@ import pencil_utensil.organaut.organization.coordinates.CoordinatesService;
 @RequestMapping("/api/organizations")
 public class OrganizationController {
 
+	private final SseService sseService;
+
 	private final AddressService addressService;
 	private final CoordinatesService coordinatesService;
 	private final OrganizationService organizationService;
@@ -45,10 +50,11 @@ public class OrganizationController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationController.class);
 
 	OrganizationController(OrganizationService organizationService, CoordinatesService coordinatesService,
-			AddressService addressService) {
+			AddressService addressService, SseService sseService) {
 		this.organizationService = organizationService;
 		this.coordinatesService = coordinatesService;
 		this.addressService = addressService;
+		this.sseService = sseService;
 	}
 
 	@GetMapping
@@ -56,9 +62,7 @@ public class OrganizationController {
 		List<Organization> organizations = organizationService.getAll();
 		return ResponseEntity.ok(organizations.stream()
 				.map(org -> {
-					Integer ownerId = organizationService.findOwnerId(org.getId());
-					LOGGER.info("{} owns {}", ownerId, org.getName());
-					return new OrganizationResponse(ownerId, org);
+					return organizationService.getDto(org);
 				})
 				.collect(Collectors.toList()));
 	}
@@ -68,11 +72,12 @@ public class OrganizationController {
 		return ResponseEntity.ok(organizationService.get(id));
 	}
 
-	static class OrganizationResponse {
+	public static class OrganizationResponse {
 		public OrganizationResponse(Integer userId, Organization organization) {
 			this.ownerId = userId;
 			this.organization = organization;
 		}
+
 		public Organization organization;
 		public Integer ownerId;
 	}
@@ -173,8 +178,8 @@ public class OrganizationController {
 		}
 		Organization organization =
 				organizationService.create(user.id, req.name, coordinates, address, req.annualTurnover,
-				req.employeesCount, req.rating,
-				req.fullName, req.type, postalAddress);
+						req.employeesCount, req.rating,
+						req.fullName, req.type, postalAddress);
 
 		LOGGER.info("{} created {}", user.name, organization.getFullName());
 		return ResponseEntity.status(HttpStatus.CREATED).body(organization);
@@ -202,8 +207,12 @@ public class OrganizationController {
 
 		public OrganizationType type;
 	}
-// FINISH THIS!
-//	@GetMapping("/sse")
+
+	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public SseEmitter sse() {
+		LOGGER.info("New SSE connection established");
+		return sseService.createEmitter();
+	}
 
 	private UserCredentials getUserCredentials() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

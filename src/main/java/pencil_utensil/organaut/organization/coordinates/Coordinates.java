@@ -34,4 +34,9 @@ public class Coordinates {
 	public Integer getX() { return x; }
 
 	public int getY() { return y; }
+
+	@Override
+	public String toString() {
+		return "Coordinates [id=" + id + ", x=" + x + ", y=" + y + "]";
+	}
 }
