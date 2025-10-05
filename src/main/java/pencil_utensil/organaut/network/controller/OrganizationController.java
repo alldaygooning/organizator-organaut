@@ -1,6 +1,7 @@
 package pencil_utensil.organaut.network.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +52,29 @@ public class OrganizationController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Organization>> all() {
-		return ResponseEntity.ok(organizationService.getAll());
+	public ResponseEntity<List<OrganizationResponse>> all() {
+		List<Organization> organizations = organizationService.getAll();
+		return ResponseEntity.ok(organizations.stream()
+				.map(org -> {
+					Integer ownerId = organizationService.findOwnerId(org.getId());
+					LOGGER.info("{} owns {}", ownerId, org.getName());
+					return new OrganizationResponse(ownerId, org);
+				})
+				.collect(Collectors.toList()));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Organization> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(organizationService.get(id));
+	}
+
+	static class OrganizationResponse {
+		public OrganizationResponse(Integer userId, Organization organization) {
+			this.ownerId = userId;
+			this.organization = organization;
+		}
+		public Organization organization;
+		public Integer ownerId;
 	}
 
 	@DeleteMapping("/delete/{id}")
@@ -154,7 +171,8 @@ public class OrganizationController {
 			 */
 			return ResponseEntity.badRequest().build();
 		}
-		Organization organization = organizationService.create(req.name, coordinates, address, req.annualTurnover,
+		Organization organization =
+				organizationService.create(user.id, req.name, coordinates, address, req.annualTurnover,
 				req.employeesCount, req.rating,
 				req.fullName, req.type, postalAddress);
 
