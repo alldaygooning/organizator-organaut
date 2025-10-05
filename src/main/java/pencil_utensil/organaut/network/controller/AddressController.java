@@ -2,6 +2,8 @@ package pencil_utensil.organaut.network.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,8 @@ import pencil_utensil.organaut.organization.address.AddressService;
 @RequestMapping("/api/organizations/addresses")
 public class AddressController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AddressController.class);
+
 	private final AddressService addressService;
 
 	AddressController(AddressService addressService) {
@@ -30,7 +34,9 @@ public class AddressController {
 
 	@PostMapping("/create")
 	public ResponseEntity<Address> create(@Valid @RequestBody CreateRequest req) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(addressService.create(req.street, req.zip));
+		Address address = addressService.create(req.street, req.zip);
+		LOGGER.info("{} created", address.toString());
+		return ResponseEntity.status(HttpStatus.CREATED).body(address);
 	}
 	
 	static class CreateRequest {

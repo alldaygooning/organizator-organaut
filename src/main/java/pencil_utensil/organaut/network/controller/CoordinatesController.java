@@ -2,6 +2,8 @@ package pencil_utensil.organaut.network.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,8 @@ import pencil_utensil.organaut.organization.coordinates.CoordinatesService;
 @RequestMapping("/api/organizations/coordinates")
 public class CoordinatesController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CoordinatesController.class);
+
 	private final CoordinatesService coordinatesService;
 
 	CoordinatesController(CoordinatesService coordinatesService) {
@@ -31,7 +35,9 @@ public class CoordinatesController {
 
 	@PostMapping("/create")
 	public ResponseEntity<Coordinates> create(@Valid @RequestBody CreateRequest req) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(coordinatesService.create(req.x, req.y));
+		Coordinates coordinates = coordinatesService.create(req.x, req.y);
+		LOGGER.info("{} created", coordinates.toString());
+		return ResponseEntity.status(HttpStatus.CREATED).body(coordinates);
 	}
 
 	static class CreateRequest {

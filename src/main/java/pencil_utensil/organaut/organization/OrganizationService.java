@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pencil_utensil.organaut.exception.OrganizationNotFoundException;
 import pencil_utensil.organaut.exception.OwnershipException;
+import pencil_utensil.organaut.network.controller.OrganizationController;
+import pencil_utensil.organaut.network.controller.OrganizationController.OrganizationResponse;
+import pencil_utensil.organaut.network.sse.BroadcastEvent;
+import pencil_utensil.organaut.network.sse.SseService;
 import pencil_utensil.organaut.organization.address.Address;
 import pencil_utensil.organaut.organization.coordinates.Coordinates;
 import pencil_utensil.organaut.organization.repository.OrganizationRepository;
@@ -18,14 +22,17 @@ import pencil_utensil.organaut.organization.repository.UserOrganizationRepositor
 @Service
 public class OrganizationService {
 
+	private final SseService sseService;
+
 	private final UserOrganizationRepository userOrganizationRepository;
 
 	private final OrganizationRepository organizationRepository;
 
 	OrganizationService(OrganizationRepository organizationRepository,
-			UserOrganizationRepository userOrganizationRepository) {
+			UserOrganizationRepository userOrganizationRepository, SseService sseService) {
 		this.organizationRepository = organizationRepository;
 		this.userOrganizationRepository = userOrganizationRepository;
+		this.sseService = sseService;
 	}
 
 	@Transactional(readOnly = true)
@@ -102,6 +109,11 @@ public class OrganizationService {
 		return organization;
 	}
 
+	public OrganizationController.OrganizationResponse getDto(Organization organization) {
+		Integer ownerId = findOwnerId(organization.getId());
+		return new OrganizationResponse(ownerId, organization);
+	}
+
 	@Transactional
 	public Organization create(Integer userId, String name, Coordinates coordinates, Address address,
 			Integer annualTurnover,
@@ -112,6 +124,8 @@ public class OrganizationService {
 		UserOrganizationId ownershipId = new UserOrganizationId(userId, saved.getId());
 		UserOrganization uo = new UserOrganization(ownershipId);
 		userOrganizationRepository.save(uo);
+
+		sseService.broadcastEvent(BroadcastEvent.ORGANIZATION_CREATED, saved);
 		return saved;
 	}
 

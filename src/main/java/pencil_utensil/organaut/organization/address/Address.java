@@ -29,4 +29,9 @@ public class Address {
 	public String getStreet() { return street; }
 
 	public String getZip() { return zip; }
+
+	@Override
+	public String toString() {
+		return "Address [id=" + id + ", street=" + street + ", zip=" + zip + "]";
+	}
 }
