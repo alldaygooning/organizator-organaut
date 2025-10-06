@@ -1,0 +1,9 @@
+FROM eclipse-temurin:17-jdk-jammy
+
+WORKDIR /organaut
+
+COPY build/libs/organaut-*.jar organaut.jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "organaut.jar"]
