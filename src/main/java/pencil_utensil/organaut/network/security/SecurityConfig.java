@@ -30,7 +30,7 @@ public class SecurityConfig {
 				.securityMatcher(
 						RegexRequestMatcher
 								.regexMatcher(
-										"^/api/organizations(/[1-9]\\d*|/addresses|/coordinates|/sse|/total-rating|/top-turnover|/employee-count)?$"))
+										"^/api/organizations(/[1-9]\\d*|/addresses|/coordinates|/sse|/total-rating|/top-turnover|/employee-count|/group-by-address)?$"))
 				.authorizeHttpRequests(authorize -> authorize
 						.anyRequest().permitAll())
 				.build();
