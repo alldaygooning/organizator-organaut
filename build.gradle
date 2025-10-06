@@ -39,6 +39,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 bootRun {
 	standardInput = System.in
 	classpath = sourceSets.main.runtimeClasspath
