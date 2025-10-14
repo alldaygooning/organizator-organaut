@@ -1,6 +1,6 @@
 # https://github.com/alldaygooning/hotswapagent-runtime-docker
 # https://hub.docker.com/repository/docker/debi1/hotswapagent-runtime
-FROM hotswapagent-runtime:latest
+FROM debi1/hotswapagent-runtime:latest
 
 WORKDIR /organaut
 
