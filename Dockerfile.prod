@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /organaut
 
@@ -6,4 +6,14 @@ COPY build/libs/organaut-*.jar organaut.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "organaut.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", \
+    "-XX:+UseContainerSupport", \
+    "-Xmx180m", "-Xms90m", \
+    "-XX:MaxMetaspaceSize=120m", \
+    "-XX:+UseSerialGC", \
+    "-XX:MaxHeapFreeRatio=30", \
+    "-XX:MinHeapFreeRatio=10", \
+    "-XX:+UseStringDeduplication", \
+    "-Dspring.main.lazy-initialization=true", \
+    "-Dspring.jmx.enabled=false", \
+    "-jar", "organaut.jar"]
